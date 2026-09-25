@@ -8,10 +8,16 @@ from app.security import hash_password
 
 
 SEED_CENTRES = [
-    {"name": "EVE Central Diagnostics", "location": "Indiranagar, Bengaluru", "tests": {"Complete Blood Count (CBC)": 450, "Lipid Profile": 850, "Thyroid Profile (T3, T4, TSH)": 700}},
-    {"name": "EVE Health Labs - Koramangala", "location": "Koramangala, Bengaluru", "tests": {"Complete Blood Count (CBC)": 500, "Lipid Profile": 900, "HbA1c": 600}},
-    {"name": "EVE Diagnostics - Whitefield", "location": "Whitefield, Bengaluru", "tests": {"Thyroid Profile (T3, T4, TSH)": 750, "HbA1c": 650, "Vitamin D": 1200}},
+    {"name": "EVE Central Diagnostics", "location": "Sector 29, Gurgaon", "tests": {"Complete Blood Count (CBC)": 450, "Lipid Profile": 850, "Thyroid Profile (T3, T4, TSH)": 700}},
+    {"name": "EVE Diagnostics - Cyber City", "location": "DLF Phase 3, Gurgaon", "tests": {"Thyroid Profile (T3, T4, TSH)": 750, "HbA1c": 650, "Vitamin D": 1200}},
+    {"name": "EVE Health Labs - Sector 56", "location": "Sector 56, Gurgaon", "tests": {"Complete Blood Count (CBC)": 500, "Lipid Profile": 900, "HbA1c": 600}},
 ]
+
+LEGACY_CENTRES = {
+    "EVE Central Diagnostics": ("EVE Central Diagnostics", "Indiranagar, Bengaluru"),
+    "EVE Diagnostics - Cyber City": ("EVE Diagnostics - Whitefield", "Whitefield, Bengaluru"),
+    "EVE Health Labs - Sector 56": ("EVE Health Labs - Koramangala", "Koramangala, Bengaluru"),
+}
 
 DESCRIPTIONS = {name: "Example catalogue item for demonstration; not medical advice." for name in (
     "Complete Blood Count (CBC)", "Lipid Profile", "Thyroid Profile (T3, T4, TSH)", "HbA1c", "Vitamin D"
@@ -21,6 +27,13 @@ DESCRIPTIONS = {name: "Example catalogue item for demonstration; not medical adv
 def seed_catalog(db: Session) -> None:
     for centre_data in SEED_CENTRES:
         centre = db.scalar(select(DiagnosticCentre).where(DiagnosticCentre.name == centre_data["name"]))
+        legacy_name, legacy_location = LEGACY_CENTRES[centre_data["name"]]
+        if centre is None and legacy_name != centre_data["name"]:
+            centre = db.scalar(select(DiagnosticCentre).where(DiagnosticCentre.name == legacy_name))
+            if centre is not None:
+                centre.name = centre_data["name"]
+        if centre is not None and centre.location == legacy_location:
+            centre.location = centre_data["location"]
         if centre is None:
             centre = DiagnosticCentre(name=centre_data["name"], location=centre_data["location"])
             db.add(centre)

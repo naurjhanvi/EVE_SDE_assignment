@@ -26,17 +26,17 @@ This project is an SDE intern assignment implementation. Centre names, tests, an
 | Edge cases | Invalid requests and IDs, unauthorized access, double booking, failed payments/retries, cancelled bookings, webhook replays, and rate limits are covered by the interactive tour and/or automated tests. |
 | Submission files | This repository includes a README, requirements file, Dockerfile, Docker Compose configuration, application source, and tests. |
 
-## Our understanding and design decisions
+## My understanding and design decisions
 
-The assignment asks for a small, understandable backend rather than a production diagnostic platform. We made these assumptions to keep the service testable while showing the important backend behavior:
+The assignment asks for a small, understandable backend rather than a production diagnostic platform. I made these assumptions to keep the service testable while showing the important backend behavior:
 
-1. **The catalogue is sample data.** Three fictional Bengaluru centres and their offers are seeded when the API starts. We did not use a Kaggle dataset because the assignment needs a small catalogue to demonstrate relationships and API behavior, not patient or operational data.
+1. **The catalogue is sample data.** Three fictional Gurgaon centres and their offers are seeded when the API starts. I did not use a Kaggle dataset because the assignment needs a small catalogue to demonstrate relationships and API behavior, not patient or operational data.
 2. **An appointment is an exact timestamp.** There is no separate calendar or list of available time slots. The patient supplies a future, timezone-aware appointment time. For this assignment, one active booking can hold a centre/test/exact-time combination. A real service would need configurable capacity, opening hours, and availability rules.
 3. **The booking keeps the price it was created with.** The booking amount is copied from the centre's offer at booking time. A later catalogue price change does not change an existing booking.
 4. **Payment is simulated.** The API never charges a card. A request can simulate a failure; a failed booking may be retried with a new idempotency key or cancelled.
 5. **Webhook delivery may repeat.** The event ID is stored as a unique key. Repeating the same event returns a duplicate response; reusing an event ID with a different payload is rejected.
 6. **Admin permission is assigned by the server.** Choosing an admin menu or changing a request body cannot grant admin access. Docker Compose provisions one local demo admin account; normal signup creates a patient account.
-7. **We prioritized the required backend behavior.** There is no web dashboard, real payment integration, appointment rescheduling, refund flow, or admin view of every patient's booking.
+7. **I prioritized the required backend behavior.** There is no web dashboard, real payment integration, appointment rescheduling, refund flow, or admin view of every patient's booking.
 
 ## Run with Docker Compose (recommended)
 
@@ -230,9 +230,9 @@ The catalogue is hand-authored in `app/seed.py` and seeded idempotently when the
 
 | Centre | Example offers |
 | --- | --- |
-| EVE Central Diagnostics — Indiranagar, Bengaluru | CBC ₹450; Lipid Profile ₹850; Thyroid Profile ₹700 |
-| EVE Diagnostics — Whitefield, Bengaluru | Vitamin D ₹1,200; Thyroid Profile ₹750; HbA1c ₹650 |
-| EVE Health Labs — Koramangala, Bengaluru | CBC ₹500; Lipid Profile ₹900; HbA1c ₹600 |
+| EVE Central Diagnostics — Sector 29, Gurgaon | CBC ₹450; Lipid Profile ₹850; Thyroid Profile ₹700 |
+| EVE Diagnostics — DLF Phase 3, Gurgaon | Vitamin D ₹1,200; Thyroid Profile ₹750; HbA1c ₹650 |
+| EVE Health Labs — Sector 56, Gurgaon | CBC ₹500; Lipid Profile ₹900; HbA1c ₹600 |
 
 The public catalogue endpoint also returns centres/tests added by an administrator.
 

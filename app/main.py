@@ -27,6 +27,7 @@ async def lifespan(_: FastAPI):
     with Session(engine) as db:
         seed_catalog(db)
         ensure_admin_account(db)
+    invalidate("catalog:centres:v1")
     yield
 
 
